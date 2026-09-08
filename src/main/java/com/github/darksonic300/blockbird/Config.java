@@ -1,4 +1,4 @@
-package com.example.examplemod;
+package com.github.darksonic300.blockbird;
 
 import java.util.List;
 import java.util.Set;
