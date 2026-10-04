@@ -9,15 +9,15 @@ version="${mod_version}"
 displayName="${mod_name}"
 updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
-logoFile="examplemod.png"
+logoFile="blockbird.png"
 credits=""
 authors=""
 description='''
 Example mod description.
 '''
 
-[[mixins]]
-config="${mod_id}.mixins.json"
+#[[mixins]]
+#config="${mod_id}.mixins.json"
 
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"

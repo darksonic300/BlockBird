@@ -17,8 +17,5 @@ public class BlockBird {
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public BlockBird(IEventBus modEventBus, ModContainer modContainer) {
-        NeoForge.EVENT_BUS.register(this);
-        modContainer.registerConfig(ModConfig.Type.CLIENT, BBConfig.SPEC);
-    }
+    public BlockBird(IEventBus modEventBus, ModContainer modContainer) {}
 }

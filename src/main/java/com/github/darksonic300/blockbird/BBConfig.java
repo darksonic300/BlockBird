@@ -1,18 +1,26 @@
 package com.github.darksonic300.blockbird;
 
-import java.util.List;
-
-import com.github.darksonic300.blockbird.enums.EmailProvider;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import com.github.darksonic300.blockbird.enums.IMAPSProvider;
+import com.github.darksonic300.blockbird.enums.SMTPProvider;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class BBConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    public static final ModConfigSpec.ConfigValue<EmailProvider> PROVIDER = BUILDER
-            .comment("Configure your preferred email provider.")
-            .defineEnum("Email Provider", EmailProvider.GMAIL);
+    public static final ModConfigSpec.ConfigValue<IMAPSProvider> PROVIDER = BUILDER
+            .comment("Configure your preferred IMAPS email provider.")
+            .defineEnum("Email Provider", IMAPSProvider.GMAIL);
+
+    public static final ModConfigSpec.ConfigValue<String> USERNAME = BUILDER
+            .comment("Configure your preferred IMAPS email username.")
+            .define("Username", "");
+    public static final ModConfigSpec.ConfigValue<String> PASSWORD = BUILDER
+            .comment("Configure your preferred IMAPS email password.")
+            .define("Password", "");
+
+    public static final ModConfigSpec.IntValue REFRESH_RATE = BUILDER
+            .comment("Configure the refresh rate of the email check in minutes.")
+            .defineInRange("Refresh Rate", 5, 1, 120);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
