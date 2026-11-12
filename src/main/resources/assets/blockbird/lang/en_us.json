@@ -1,14 +1,10 @@
 {
-  "itemGroup.examplemod": "Example Mod Tab",
-  "block.examplemod.example_block": "Example Block",
-  "item.examplemod.example_item": "Example Item",
+  "blockbird.configuration.title": "BlockBird Configs",
+  "blockbird.configuration.section.blockbird.common.toml": "BlockBird Configs",
+  "blockbird.configuration.section.blockbird.common.toml.title": "BlockBird Configs",
+  "gui.blockbird.reminder_screen.first_line": "BlockBird needs to be configured in order to receive emails.",
+  "gui.blockbird.reminder_screen.second_line": "Do you want to do that now?",
+  "gui.blockbird.reminder_screen.config_button": "To Config",
+  "gui.blockbird.reminder_screen.main_button": "Later"
 
-  "examplemod.configuration.title": "Example Mod Configs",
-  "examplemod.configuration.section.examplemod.common.toml": "Example Mod Configs",
-  "examplemod.configuration.section.examplemod.common.toml.title": "Example Mod Configs",
-  "examplemod.configuration.items": "Item List",
-  "examplemod.configuration.logDirtBlock": "Log Dirt Block",
-  "examplemod.configuration.magicNumberIntroduction": "Magic Number Text",
-  "examplemod.configuration.magicNumber": "Magic Number",
-  "mainMail.title": "Incoming Emails"
 }

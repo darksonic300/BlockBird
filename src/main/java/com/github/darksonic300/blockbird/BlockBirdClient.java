@@ -1,8 +1,10 @@
 package com.github.darksonic300.blockbird;
 
+import com.github.darksonic300.blockbird.screen.ConfigReminderScreen;
 import com.github.darksonic300.blockbird.screen.EmailToast;
-import jakarta.mail.Message;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -10,11 +12,12 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.LevelEvent;
 
+import java.io.Console;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +28,7 @@ public class BlockBirdClient {
 
     private BBMainManager emailManager;
     private boolean isRunning = false; // Prevents thread spamming
+    private static boolean showScreen = true;
 
     public BlockBirdClient(IEventBus modEventBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.CLIENT, BBConfig.SPEC);
@@ -33,6 +37,17 @@ public class BlockBirdClient {
         NeoForge.EVENT_BUS.addListener(this::onWorldLoad);
         NeoForge.EVENT_BUS.addListener(this::onWorldUnload);
         NeoForge.EVENT_BUS.addListener(this::checkMail);
+        NeoForge.EVENT_BUS.addListener(this::onGuiOpen);
+    }
+
+    public void onGuiOpen(ScreenEvent.Opening event) {
+        Screen screen = event.getScreen();
+        showScreen = showScreen && BBConfig.PASSWORD.get().isEmpty();
+        System.out.println("Showing screen: " + showScreen);
+        if (screen instanceof TitleScreen title && showScreen) {
+            event.setNewScreen(new ConfigReminderScreen(title));
+            showScreen = false;
+        }
     }
 
     public void onWorldLoad(ClientPlayerNetworkEvent.LoggingIn event) {
