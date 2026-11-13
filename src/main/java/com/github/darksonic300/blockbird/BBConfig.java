@@ -1,7 +1,6 @@
 package com.github.darksonic300.blockbird;
 
 import com.github.darksonic300.blockbird.enums.IMAPSProvider;
-import com.github.darksonic300.blockbird.enums.SMTPProvider;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class BBConfig {

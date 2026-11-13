@@ -5,6 +5,7 @@ import com.github.darksonic300.blockbird.screen.EmailToast;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -17,7 +18,6 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.io.Console;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
@@ -43,7 +43,6 @@ public class BlockBirdClient {
     public void onGuiOpen(ScreenEvent.Opening event) {
         Screen screen = event.getScreen();
         showScreen = showScreen && BBConfig.PASSWORD.get().isEmpty();
-        System.out.println("Showing screen: " + showScreen);
         if (screen instanceof TitleScreen title && showScreen) {
             event.setNewScreen(new ConfigReminderScreen(title));
             showScreen = false;
@@ -67,14 +66,10 @@ public class BlockBirdClient {
 
     public void checkMail(ClientTickEvent.Post event) {
         if(this.emailManager == null || isRunning) return;
-        /*if (ChronoUnit.MINUTES.between(
+        if (ChronoUnit.MINUTES.between(
                 this.emailManager.getLastCheck().toInstant(),
                 new Date().toInstant()
-        ) < BBConfig.REFRESH_RATE.getAsInt()) return;*/
-        if (ChronoUnit.SECONDS.between(
-                this.emailManager.getLastCheck().toInstant(),
-                new Date().toInstant()
-        ) < 10) return;
+        ) < BBConfig.REFRESH_RATE.getAsInt()) return;
 
         isRunning = true;
 
@@ -89,12 +84,12 @@ public class BlockBirdClient {
                 }).whenComplete((result, exception) -> {
                     isRunning = false;
                     if (exception != null) {
-                        exception.printStackTrace();
+                        BlockBird.LOGGER.warn("Failed to check emails.", exception);
                     }
                 });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            BlockBird.LOGGER.warn("Failed to check emails.", e);
         }
     }
 
