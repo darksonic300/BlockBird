@@ -1,8 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.146'
     id 'idea'
+    id 'com.gradleup.shadow' version '9.6.1'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -75,15 +78,20 @@ neoForge {
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+    shadowed
+    implementation.extendsFrom shadowed
 }
 
 dependencies {
-    implementation "org.eclipse.angus:jakarta.mail:2.0.4"
-    additionalRuntimeClasspath "org.eclipse.angus:jakarta.mail:2.0.4"
+    shadowed "jakarta.mail:jakarta.mail-api:2.1.3"
+    shadowed "jakarta.activation:jakarta.activation-api:2.1.3"
+    shadowed "org.eclipse.angus:jakarta.mail:2.0.4"
+    shadowed "org.eclipse.angus:angus-activation:2.0.2"
 
-    jarJar "jakarta.mail:jakarta.mail-api:2.1.3"
-    jarJar "org.eclipse.angus:jakarta.mail:2.0.4"
-    jarJar "org.eclipse.angus:angus-activation:2.0.2"
+    additionalRuntimeClasspath "jakarta.mail:jakarta.mail-api:2.1.3"
+    additionalRuntimeClasspath "jakarta.activation:jakarta.activation-api:2.1.3"
+    additionalRuntimeClasspath "org.eclipse.angus:jakarta.mail:2.0.4"
+    additionalRuntimeClasspath "org.eclipse.angus:angus-activation:2.0.2"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -121,6 +129,20 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+tasks.named('jar', Jar) {
+    archiveClassifier.set('slim')
+}
+
+tasks.named('shadowJar', ShadowJar) {
+    configurations = [project.configurations.shadowed]
+    mergeServiceFiles()
+    archiveClassifier.set('')
+}
+
+tasks.named('build') {
+    dependsOn shadowJar
 }
 
 idea {
