@@ -10,12 +10,12 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.NeoForge;
 
-
 @Mod(BlockBird.MODID)
 public class BlockBird {
-    public static final String MODID = "blockbird";
+	public static final String MODID = "blockbird";
 
-    public static final Logger LOGGER = LogUtils.getLogger();
+	public static final Logger LOGGER = LogUtils.getLogger();
 
-    public BlockBird(IEventBus modEventBus, ModContainer modContainer) {}
+	public BlockBird(IEventBus modEventBus, ModContainer modContainer) {
+	}
 }
