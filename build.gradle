@@ -7,6 +7,7 @@ plugins {
     id 'idea'
     id 'com.diffplug.spotless' version '8.2.1'
     id 'com.gradleup.shadow' version '9.6.1'
+    id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -157,5 +158,33 @@ idea {
     module {
         downloadSources = true
         downloadJavadoc = true
+    }
+}
+
+publishMods {
+    file = tasks.shadowJar.archiveFile
+    changelog = file("./changelogs/CHANGELOG-0.1.0.md").text
+    type = BETA
+    modLoaders.add("neoforge")
+    displayName = mod_name + " " + minecraft_version + "-" + mod_version
+
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = curseforge_project_id
+        minecraftVersions.add(minecraft_version)
+        client = true
+    }
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = modrinth_project_id
+        minecraftVersions.add(minecraft_version)
+        environment = CLIENT_ONLY
+    }
+
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        repository = "darksonic300/${mod_name}"
+        commitish = minecraft_version
     }
 }
