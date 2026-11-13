@@ -9,5 +9,9 @@
   "blockbird.configuration.Email Provider": "Email Provider",
   "blockbird.configuration.Username": "Username",
   "blockbird.configuration.Password": "Password",
-  "blockbird.configuration.Refresh Rate": "Refresh Rate (in minutes)"
+  "blockbird.configuration.Refresh Rate": "Refresh Rate (in minutes)",
+  "gui.blockbird.toast.disabled": "BlockBird Disabled",
+  "gui.blockbird.toast.enabled": "BlockBird Enabled",
+  "gui.blockbird.toast.failed_to_connect": "Connection Error",
+  "gui.blockbird.toast.failed_to_read": "Reading Error"
 }

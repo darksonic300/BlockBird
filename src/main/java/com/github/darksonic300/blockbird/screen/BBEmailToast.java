@@ -18,7 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
-public class EmailToast implements Toast {
+public class BBEmailToast implements Toast {
     private static final ResourceLocation BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("toast/system");
     private static final ResourceLocation ICON_SPRITE = ResourceLocation.fromNamespaceAndPath(BlockBird.MODID, "blockmail/icon");
 
@@ -28,7 +28,7 @@ public class EmailToast implements Toast {
     private final Pair<String, String> message;
     private boolean playedSound;
 
-    public EmailToast(Pair<String, String> message) {
+    public BBEmailToast(Pair<String, String> message) {
         this.message = message;
     }
 

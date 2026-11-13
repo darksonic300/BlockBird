@@ -1,16 +1,17 @@
 package com.github.darksonic300.blockbird;
 
 import com.github.darksonic300.blockbird.enums.IMAPSProvider;
+import com.github.darksonic300.blockbird.screen.BBBaseToast;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 import jakarta.mail.internet.InternetAddress;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -32,6 +33,10 @@ public class BBMainManager {
         this.lastCheck = new Date();
     }
 
+    public boolean isInitialized() {
+        return store != null;
+    }
+
     public void initialize() {
         Properties properties = new Properties();
 
@@ -40,15 +45,21 @@ public class BBMainManager {
         properties.put("mail.imaps.starttls.enable", "true");
         Session emailSession = Session.getDefaultInstance(properties);
 
+        if(username.isEmpty() || password.isEmpty()) {
+            return;
+        }
+
         try {
             this.store = emailSession.getStore("imaps");
             this.store.connect(provider.host, username, password);
-            System.out.println("Connected to the email server.");
         } catch (Exception e) {
-            e.printStackTrace();
             this.store = null;
-            System.out.println("Failed to connect to the email server.");
+            BlockBird.LOGGER.warn("Failed to connect to the email server.");
+            Minecraft.getInstance().getToasts().addToast(new BBBaseToast(Component.translatable("gui.blockbird.toast.failed_to_connect")));
         }
+
+        if(store == null) return;
+        BlockBird.LOGGER.info("Connected to the email server.");
     }
 
     public List<Pair<String, String>> check() {
@@ -84,8 +95,9 @@ public class BBMainManager {
             this.lastCheck = new Date();
             return pairs;
         } catch (Exception e) {
-            e.printStackTrace();
             this.store = null;
+            BlockBird.LOGGER.warn("Failed to read emails.");
+            Minecraft.getInstance().getToasts().addToast(new BBBaseToast(Component.translatable("gui.blockbird.toast.failed_to_read")));
         }
         return List.of();
     }
@@ -95,7 +107,7 @@ public class BBMainManager {
         try {
             store.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            BlockBird.LOGGER.warn("The store was not closed properly???.");
         }
     }
 

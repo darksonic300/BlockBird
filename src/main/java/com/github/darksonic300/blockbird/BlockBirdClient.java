@@ -1,11 +1,12 @@
 package com.github.darksonic300.blockbird;
 
+import com.github.darksonic300.blockbird.screen.BBBaseToast;
 import com.github.darksonic300.blockbird.screen.ConfigReminderScreen;
-import com.github.darksonic300.blockbird.screen.EmailToast;
+import com.github.darksonic300.blockbird.screen.BBEmailToast;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -42,7 +43,7 @@ public class BlockBirdClient {
 
     public void onGuiOpen(ScreenEvent.Opening event) {
         Screen screen = event.getScreen();
-        showScreen = showScreen && BBConfig.PASSWORD.get().isEmpty();
+        showScreen = showScreen && (BBConfig.PASSWORD.get().isEmpty() || BBConfig.EMAIL.get().isEmpty());
         if (screen instanceof TitleScreen title && showScreen) {
             event.setNewScreen(new ConfigReminderScreen(title));
             showScreen = false;
@@ -52,11 +53,16 @@ public class BlockBirdClient {
     public void onWorldLoad(ClientPlayerNetworkEvent.LoggingIn event) {
         this.emailManager = new BBMainManager(
                 BBConfig.PROVIDER.get(),
-                BBConfig.USERNAME.get(),
+                BBConfig.EMAIL.get(),
                 BBConfig.PASSWORD.get()
         );
 
         this.emailManager.initialize();
+        Component component = Component.translatable("gui.blockbird.toast.disabled");
+        if(this.emailManager.isInitialized()) {
+            component = Component.translatable("gui.blockbird.toast.enabled");
+        }
+        Minecraft.getInstance().getToasts().addToast(new BBBaseToast(component));
     }
 
     public void onWorldUnload(ClientPlayerNetworkEvent.LoggingOut event) {
@@ -78,7 +84,7 @@ public class BlockBirdClient {
                 .thenAccept(messages -> {
                     if (messages != null && !messages.isEmpty()) {
                             for (var msg : messages) {
-                                Minecraft.getInstance().getToasts().addToast(new EmailToast(msg));
+                                Minecraft.getInstance().getToasts().addToast(new BBEmailToast(msg));
                             }
                     }
                 }).whenComplete((result, exception) -> {

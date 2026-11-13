@@ -10,7 +10,7 @@ public class BBConfig {
             .comment("Configure your preferred IMAPS email provider.")
             .defineEnum("Email Provider", IMAPSProvider.GMAIL);
 
-    public static final ModConfigSpec.ConfigValue<String> USERNAME = BUILDER
+    public static final ModConfigSpec.ConfigValue<String> EMAIL = BUILDER
             .comment("Configure your preferred IMAPS email username.")
             .define("Username", "");
     public static final ModConfigSpec.ConfigValue<String> PASSWORD = BUILDER
