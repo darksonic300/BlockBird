@@ -44,8 +44,8 @@ public class BBEmailToast implements Toast {
 
         Font font = toastComponent.getMinecraft().font;
 
-        String subjectRaw = message.getLeft() != null ? message.getLeft() : "No Subject";
-        String senderRaw = message.getRight() != null ? message.getRight() : "";
+        String subjectRaw = message.getLeft() != null ? message.getLeft() : Component.translatable("gui.blockbird.toast.no_subject").toString();
+        String senderRaw = message.getRight() != null ? message.getRight() :  Component.translatable("gui.blockbird.toast.unknown").toString();
 
         List<FormattedCharSequence> splitSubject = font.split(Component.literal(subjectRaw), 100);
         List<FormattedCharSequence> splitSender = font.split(Component.literal(senderRaw), 100);
@@ -57,7 +57,7 @@ public class BBEmailToast implements Toast {
             float fadeOut = Mth.clamp((float)(1500L - timeSinceLastVisible) / 300.0F, 0.0F, 1.0F);
             int alpha = Mth.floor(fadeOut * 255.0F) << 24;
 
-            guiGraphics.drawString(font, Component.literal("New Email"), 38, 12, alpha | 0xFFFF00, false);
+            guiGraphics.drawString(font, Component.translatable("gui.blockbird.toast.new_email"), 38, 12, alpha | 0xFFFF00, false);
         } else {
             float fadeIn = Mth.clamp((float)(timeSinceLastVisible - 1500L) / 300.0F, 0.0F, 1.0F);
             int alpha = Mth.floor(fadeIn * 255.0F) << 24;

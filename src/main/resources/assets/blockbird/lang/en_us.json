@@ -13,5 +13,8 @@
   "gui.blockbird.toast.disabled": "BlockBird Disabled",
   "gui.blockbird.toast.enabled": "BlockBird Enabled",
   "gui.blockbird.toast.failed_to_connect": "Connection Error",
-  "gui.blockbird.toast.failed_to_read": "Reading Error"
+  "gui.blockbird.toast.failed_to_read": "Reading Error",
+  "gui.blockbird.toast.new_email": "New Email",
+  "gui.blockbird.toast.no_subject": "No Subject",
+  "gui.blockbird.toast.unknown": "Unknown"
 }
