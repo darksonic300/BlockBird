@@ -5,6 +5,9 @@
   "gui.blockbird.reminder_screen.first_line": "BlockBird needs to be configured in order to receive emails.",
   "gui.blockbird.reminder_screen.second_line": "Do you want to do that now?",
   "gui.blockbird.reminder_screen.config_button": "To Config",
-  "gui.blockbird.reminder_screen.main_button": "Later"
-
+  "gui.blockbird.reminder_screen.main_button": "Later",
+  "blockbird.configuration.Email Provider": "Email Provider",
+  "blockbird.configuration.Username": "Username",
+  "blockbird.configuration.Password": "Password",
+  "blockbird.configuration.Refresh Rate": "Refresh Rate (in minutes)"
 }

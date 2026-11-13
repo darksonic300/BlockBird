@@ -7,13 +7,12 @@ issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-updateJSONURL="https://change.me.example.invalid/updates.json"
+#updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
 logoFile="blockbird.png"
-credits=""
-authors=""
+authors="darksonic300"
 description='''
-Example mod description.
+Make Minecraft your email client! Receive emails directly during gameplay.
 '''
 
 #[[mixins]]
