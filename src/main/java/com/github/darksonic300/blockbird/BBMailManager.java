@@ -121,8 +121,8 @@ public class BBMailManager {
 		return lastCheck;
 	}
 
-
-	private static @NotNull ArrayList<Pair<String, String>> getMappedPairs(List<Message> messages) throws MessagingException {
+	private static @NotNull ArrayList<Pair<String, String>> getMappedPairs(List<Message> messages)
+			throws MessagingException {
 		var pairs = new ArrayList<Pair<String, String>>();
 		if (!messages.isEmpty()) {
 			for (var msg : messages) {

@@ -2,6 +2,7 @@ package com.github.darksonic300.blockbird;
 
 import com.github.darksonic300.blockbird.screen.ConfigReminderScreen;
 import com.github.darksonic300.blockbird.util.BBToasts;
+import com.github.darksonic300.blockbird.util.BBUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
@@ -16,8 +17,6 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 @Mod(value = BlockBird.MODID, dist = Dist.CLIENT)
@@ -40,14 +39,17 @@ public class BlockBirdClient {
 	public void onGuiOpen(ScreenEvent.Opening event) {
 		Screen screen = event.getScreen();
 		showScreen = showScreen && (BBConfig.PASSWORD.get().isEmpty() || BBConfig.EMAIL.get().isEmpty());
-		if (screen instanceof TitleScreen title && showScreen) {
-			event.setNewScreen(new ConfigReminderScreen(title));
-			showScreen = false;
-		}
+
+		if (!(screen instanceof TitleScreen title) || !showScreen)
+			return;
+
+		event.setNewScreen(new ConfigReminderScreen(title));
+		showScreen = false;
 	}
 
 	public void onWorldLoad(ClientPlayerNetworkEvent.LoggingIn event) {
-		this.emailManager = BBMailManager.getInstance(BBConfig.PROVIDER.get(), BBConfig.EMAIL.get(), BBConfig.PASSWORD.get());
+		this.emailManager = BBMailManager.getInstance(BBConfig.PROVIDER.get(), BBConfig.EMAIL.get(),
+				BBConfig.PASSWORD.get());
 
 		this.emailManager.initialize();
 		Component component = Component.translatable("gui.blockbird.toast.disabled");
@@ -58,25 +60,22 @@ public class BlockBirdClient {
 	}
 
 	public void onWorldUnload(ClientPlayerNetworkEvent.LoggingOut event) {
-		if (this.emailManager == null)
+		if (this.emailManager == null || !this.emailManager.isInitialized())
 			return;
 		this.emailManager.close();
 	}
 
 	public void checkMail(ClientTickEvent.Post event) {
-		if (this.emailManager == null || isRunning)
+		if (this.emailManager == null || !this.emailManager.isInitialized() || isRunning)
 			return;
-		if (ChronoUnit.MINUTES.between(this.emailManager.getLastCheck().toInstant(),
-				new Date().toInstant()) < BBConfig.REFRESH_RATE.getAsInt())
+		if (BBUtils.hasEnoughTimePassed(emailManager))
 			return;
 
 		isRunning = true;
-		CompletableFuture.supplyAsync(() -> this.emailManager.check())
-				.thenAccept(messages -> {
-					if (messages == null || messages.isEmpty()) return;
-					messages.forEach(BBToasts::email);
-				})
-				.whenComplete((r, e) -> isRunning = false);
+		CompletableFuture.supplyAsync(() -> this.emailManager.check()).thenAccept(messages -> {
+			if (messages == null || messages.isEmpty())
+				return;
+			messages.forEach(BBToasts::email);
+		}).whenComplete((r, e) -> isRunning = false);
 	}
-
 }
