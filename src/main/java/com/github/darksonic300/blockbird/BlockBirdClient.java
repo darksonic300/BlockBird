@@ -1,14 +1,11 @@
 package com.github.darksonic300.blockbird;
 
-import com.github.darksonic300.blockbird.screen.BBBaseToast;
 import com.github.darksonic300.blockbird.screen.ConfigReminderScreen;
-import com.github.darksonic300.blockbird.screen.BBEmailToast;
-import net.minecraft.client.Minecraft;
+import com.github.darksonic300.blockbird.util.BBToasts;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -30,7 +27,7 @@ public class BlockBirdClient {
 	private boolean isRunning = false; // Prevents thread spamming
 	private static boolean showScreen = true;
 
-	public BlockBirdClient(IEventBus modEventBus, ModContainer container) {
+	public BlockBirdClient(ModContainer container) {
 		container.registerConfig(ModConfig.Type.CLIENT, BBConfig.SPEC);
 		container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
@@ -57,7 +54,7 @@ public class BlockBirdClient {
 		if (this.emailManager.isInitialized()) {
 			component = Component.translatable("gui.blockbird.toast.enabled");
 		}
-		Minecraft.getInstance().getToasts().addToast(new BBBaseToast(component));
+		BBToasts.info(component);
 	}
 
 	public void onWorldUnload(ClientPlayerNetworkEvent.LoggingOut event) {
@@ -74,24 +71,12 @@ public class BlockBirdClient {
 			return;
 
 		isRunning = true;
-
-		try {
-			CompletableFuture.supplyAsync(() -> this.emailManager.check()).thenAccept(messages -> {
-				if (messages != null && !messages.isEmpty()) {
-					for (var msg : messages) {
-						Minecraft.getInstance().getToasts().addToast(new BBEmailToast(msg));
-					}
-				}
-			}).whenComplete((result, exception) -> {
-				isRunning = false;
-				if (exception != null) {
-					BlockBird.LOGGER.warn("Failed to check emails.", exception);
-				}
-			});
-
-		} catch (Exception e) {
-			BlockBird.LOGGER.warn("Failed to check emails.", e);
-		}
+		CompletableFuture.supplyAsync(() -> this.emailManager.check())
+				.thenAccept(messages -> {
+					if (messages == null || messages.isEmpty()) return;
+					messages.forEach(BBToasts::email);
+				})
+				.whenComplete((r, e) -> isRunning = false);
 	}
 
 }
