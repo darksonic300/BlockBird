@@ -1,36 +1,55 @@
 package com.github.darksonic300.blockbird;
 
 import com.github.darksonic300.blockbird.enums.IMAPSProvider;
-import com.github.darksonic300.blockbird.screen.BBBaseToast;
-import jakarta.mail.Folder;
-import jakarta.mail.Message;
-import jakarta.mail.Session;
-import jakarta.mail.Store;
+import com.github.darksonic300.blockbird.util.BBToasts;
+import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-public class BBMainManager {
+public class BBMailManager {
 
-	private final IMAPSProvider provider;
-	private final String username;
-	private final String password;
+	private static final int NEW_MSG_COUNT = 5;
 
+	private IMAPSProvider provider;
+	private String username;
+	private String password;
+
+	private static BBMailManager instance = null;
 	private Store store = null;
 	private Date lastCheck;
 
-	public BBMainManager(IMAPSProvider provider, String username, String password) {
+	private BBMailManager(IMAPSProvider provider, String username, String password) {
 		this.provider = provider;
 		this.username = username;
 		this.password = password;
 
 		this.lastCheck = new Date();
+	}
+
+	public static BBMailManager getInstance(IMAPSProvider provider, String username, String password) {
+		if (instance == null) {
+			instance = new BBMailManager(provider, username, password);
+		}
+		return instance;
+	}
+
+	public void setProvider(IMAPSProvider provider) {
+		this.provider = provider;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public boolean isInitialized() {
@@ -55,8 +74,7 @@ public class BBMainManager {
 		} catch (Exception e) {
 			this.store = null;
 			BlockBird.LOGGER.warn("Failed to connect to the email server.");
-			Minecraft.getInstance().getToasts()
-					.addToast(new BBBaseToast(Component.translatable("gui.blockbird.toast.failed_to_connect")));
+			BBToasts.info(Component.translatable("gui.blockbird.toast.failed_to_connect"));
 		}
 
 		if (store == null)
@@ -72,33 +90,19 @@ public class BBMainManager {
 		}
 
 		try {
-			var pairs = new ArrayList<Pair<String, String>>();
 			Folder emailFolder = store.getFolder("INBOX");
 			emailFolder.open(Folder.READ_ONLY);
-			List<Message> messages = new ArrayList<>();
-			for (int i = 0; i < 5; i++) {
-				messages.add(emailFolder.getMessage(emailFolder.getMessageCount() - i));
-			}
 
-			messages = messages.stream().filter(msg -> {
-				try {
-					return msg.getReceivedDate().after(this.lastCheck);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}).toList();
+			List<Message> messages = getRecentMessages(emailFolder);
+			var pairs = getMappedPairs(messages);
 
-			for (var msg : messages) {
-				pairs.add(Pair.of(((InternetAddress) msg.getFrom()[0]).getPersonal(), msg.getSubject()));
-			}
 			emailFolder.close(false);
 			this.lastCheck = new Date();
 			return pairs;
 		} catch (Exception e) {
 			this.store = null;
 			BlockBird.LOGGER.warn("Failed to read emails.");
-			Minecraft.getInstance().getToasts()
-					.addToast(new BBBaseToast(Component.translatable("gui.blockbird.toast.failed_to_read")));
+			BBToasts.info(Component.translatable("gui.blockbird.toast.failed_to_read"));
 		}
 		return List.of();
 	}
@@ -115,5 +119,27 @@ public class BBMainManager {
 
 	public Date getLastCheck() {
 		return lastCheck;
+	}
+
+
+	private static @NotNull ArrayList<Pair<String, String>> getMappedPairs(List<Message> messages) throws MessagingException {
+		var pairs = new ArrayList<Pair<String, String>>();
+		if (!messages.isEmpty()) {
+			for (var msg : messages) {
+				pairs.add(Pair.of(((InternetAddress) msg.getFrom()[0]).getPersonal(), msg.getSubject()));
+			}
+		}
+		return pairs;
+	}
+
+	private @NotNull List<Message> getRecentMessages(Folder emailFolder) throws MessagingException {
+		List<Message> messages = new ArrayList<>();
+		for (int i = 0; i < NEW_MSG_COUNT; i++) {
+			var current = emailFolder.getMessage(emailFolder.getMessageCount() - i);
+			if (!current.getReceivedDate().after(this.lastCheck) || current.isExpunged())
+				continue;
+			messages.add(current);
+		}
+		return messages;
 	}
 }

@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 @Mod(value = BlockBird.MODID, dist = Dist.CLIENT)
 public class BlockBirdClient {
 
-	private BBMainManager emailManager;
+	private BBMailManager emailManager;
 	private boolean isRunning = false; // Prevents thread spamming
 	private static boolean showScreen = true;
 
@@ -50,7 +50,7 @@ public class BlockBirdClient {
 	}
 
 	public void onWorldLoad(ClientPlayerNetworkEvent.LoggingIn event) {
-		this.emailManager = new BBMainManager(BBConfig.PROVIDER.get(), BBConfig.EMAIL.get(), BBConfig.PASSWORD.get());
+		this.emailManager = BBMailManager.getInstance(BBConfig.PROVIDER.get(), BBConfig.EMAIL.get(), BBConfig.PASSWORD.get());
 
 		this.emailManager.initialize();
 		Component component = Component.translatable("gui.blockbird.toast.disabled");
