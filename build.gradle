@@ -8,6 +8,7 @@ plugins {
     id 'com.diffplug.spotless' version '8.2.1'
     id 'com.gradleup.shadow' version '9.6.1'
     id "me.modmuss50.mod-publish-plugin" version "2.2.0"
+    id 'com.github.jakemarsden.git-hooks' version '0.0.2'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -151,7 +152,7 @@ tasks.named('shadowJar', ShadowJar) {
 }
 
 tasks.named('build') {
-    dependsOn shadowJar
+    dependsOn(shadowJar, "spotlessApply")
 }
 
 idea {
@@ -159,6 +160,10 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+gitHooks {
+    hooks = ['pre-commit': 'spotlessApply']
 }
 
 publishMods {
