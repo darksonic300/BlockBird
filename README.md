@@ -17,7 +17,7 @@ Make Minecraft your email client! Receive emails directly during gameplay.
 
 ### Description
 
-**BlockBird** is a client-side mod that renders your Minecraft instance your email client!
+**BlockBird** is a client-side mod that transforms your Minecraft instance into your email client!
 
 This does not replace your actual email client but enables notifications to be received in-game.
 
