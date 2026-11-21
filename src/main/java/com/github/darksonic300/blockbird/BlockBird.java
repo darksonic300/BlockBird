@@ -16,6 +16,6 @@ public class BlockBird {
 
 	public static final Logger LOGGER = LogUtils.getLogger();
 
-	public BlockBird(IEventBus modEventBus, ModContainer modContainer) {
+	public BlockBird() {
 	}
 }

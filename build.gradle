@@ -168,7 +168,7 @@ gitHooks {
 
 publishMods {
     file = tasks.shadowJar.archiveFile
-    changelog = file("./changelogs/CHANGELOG-0.1.0.md").text
+    changelog = file("./changelogs/CHANGELOG-${mod_version}.md").text
     type = BETA
     modLoaders.add("neoforge")
     displayName = mod_name + " " + minecraft_version + "-" + mod_version
