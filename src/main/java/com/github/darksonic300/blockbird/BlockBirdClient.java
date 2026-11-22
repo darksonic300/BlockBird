@@ -17,13 +17,15 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Mod(value = BlockBird.MODID, dist = Dist.CLIENT)
 public class BlockBirdClient {
 
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
 	private BBMailManager emailManager;
-	private boolean isRunning = false; // Prevents thread spamming
 	private static boolean showScreen = true;
 
 	public BlockBirdClient(ModContainer container) {
@@ -51,12 +53,13 @@ public class BlockBirdClient {
 		this.emailManager = BBMailManager.getInstance(BBConfig.PROVIDER.get(), BBConfig.EMAIL.get(),
 				BBConfig.PASSWORD.get());
 
-		this.emailManager.initialize();
-		Component component = Component.translatable("gui.blockbird.toast.disabled");
-		if (this.emailManager.isInitialized()) {
-			component = Component.translatable("gui.blockbird.toast.enabled");
-		}
-		BBToasts.info(component);
+        this.executorService.submit(() -> {
+            this.emailManager.initialize();
+            Component component = this.emailManager.isInitialized() ?
+                    Component.translatable("gui.blockbird.toast.enabled") :
+                    Component.translatable("gui.blockbird.toast.disabled");
+            BBToasts.info(component);
+        });
 	}
 
 	public void onWorldUnload(ClientPlayerNetworkEvent.LoggingOut event) {
@@ -66,16 +69,16 @@ public class BlockBirdClient {
 	}
 
 	public void checkMail(ClientTickEvent.Post event) {
-		if (this.emailManager == null || !this.emailManager.isInitialized() || isRunning)
+		if (this.emailManager == null || !this.emailManager.isInitialized())
 			return;
-		if (BBUtils.hasEnoughTimePassed(emailManager))
+		if (!BBUtils.hasEnoughTimePassed(emailManager))
 			return;
 
-		isRunning = true;
-		CompletableFuture.supplyAsync(() -> this.emailManager.check()).thenAccept(messages -> {
-			if (messages == null || messages.isEmpty())
-				return;
-			messages.forEach(BBToasts::email);
-		}).whenComplete((r, e) -> isRunning = false);
+        this.executorService.submit(() -> {
+            var messages = this.emailManager.check();
+            if (messages == null || messages.isEmpty())
+                return;
+            messages.forEach(BBToasts::email);
+        });
 	}
 }

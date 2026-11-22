@@ -17,13 +17,13 @@ public class BBMailManager {
 
 	private static final int NEW_MSG_COUNT = 5;
 
-	private IMAPSProvider provider;
-	private String username;
-	private String password;
+	private volatile IMAPSProvider provider;
+	private volatile String username;
+	private volatile String password;
 
 	private static BBMailManager instance = null;
-	private Store store = null;
-	private Date lastCheck;
+	private volatile Store store = null;
+	private volatile Date lastCheck;
 
 	private BBMailManager(IMAPSProvider provider, String username, String password) {
 		this.provider = provider;
@@ -36,7 +36,11 @@ public class BBMailManager {
 	public static BBMailManager getInstance(IMAPSProvider provider, String username, String password) {
 		if (instance == null) {
 			instance = new BBMailManager(provider, username, password);
-		}
+		} else {
+            instance.setProvider(provider);
+            instance.setUsername(username);
+            instance.setPassword(password);
+        }
 		return instance;
 	}
 
@@ -57,12 +61,13 @@ public class BBMailManager {
 	}
 
 	public void initialize() {
+        this.close();
 		Properties properties = new Properties();
 
 		properties.put("mail.imaps.host", provider.host);
 		properties.put("mail.imaps.port", provider.port);
 		properties.put("mail.imaps.starttls.enable", "true");
-		Session emailSession = Session.getDefaultInstance(properties);
+		Session emailSession = Session.getInstance(properties);
 
 		if (username.isEmpty() || password.isEmpty()) {
 			return;
@@ -114,7 +119,9 @@ public class BBMailManager {
 			store.close();
 		} catch (Exception e) {
 			BlockBird.LOGGER.warn("The store was not closed properly???.");
-		}
+		} finally {
+            store = null;
+        }
 	}
 
 	public Date getLastCheck() {
@@ -126,7 +133,12 @@ public class BBMailManager {
 		var pairs = new ArrayList<Pair<String, String>>();
 		if (!messages.isEmpty()) {
 			for (var msg : messages) {
-				pairs.add(Pair.of(((InternetAddress) msg.getFrom()[0]).getPersonal(), msg.getSubject()));
+                Address[] from = msg.getFrom();
+                InternetAddress sender = (from == null || from.length == 0) ? null : (InternetAddress) from[0];
+				pairs.add(Pair.of(
+                        sender == null ? null : sender.getPersonal(),
+                        msg.getSubject()
+                        ));
 			}
 		}
 		return pairs;
@@ -134,9 +146,10 @@ public class BBMailManager {
 
 	private @NotNull List<Message> getRecentMessages(Folder emailFolder) throws MessagingException {
 		List<Message> messages = new ArrayList<>();
-		for (int i = 0; i < NEW_MSG_COUNT; i++) {
+        var length = Math.min(emailFolder.getMessageCount(), NEW_MSG_COUNT);
+		for (int i = 0; i < length; i++) {
 			var current = emailFolder.getMessage(emailFolder.getMessageCount() - i);
-			if (!current.getReceivedDate().after(this.lastCheck) || current.isExpunged())
+			if (current.isExpunged() || !current.getReceivedDate().after(this.lastCheck))
 				continue;
 			messages.add(current);
 		}
