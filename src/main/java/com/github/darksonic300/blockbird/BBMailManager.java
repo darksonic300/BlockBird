@@ -37,10 +37,10 @@ public class BBMailManager {
 		if (instance == null) {
 			instance = new BBMailManager(provider, username, password);
 		} else {
-            instance.setProvider(provider);
-            instance.setUsername(username);
-            instance.setPassword(password);
-        }
+			instance.setProvider(provider);
+			instance.setUsername(username);
+			instance.setPassword(password);
+		}
 		return instance;
 	}
 
@@ -61,7 +61,7 @@ public class BBMailManager {
 	}
 
 	public void initialize() {
-        this.close();
+		this.close();
 		Properties properties = new Properties();
 
 		properties.put("mail.imaps.host", provider.host);
@@ -120,8 +120,8 @@ public class BBMailManager {
 		} catch (Exception e) {
 			BlockBird.LOGGER.warn("The store was not closed properly???.");
 		} finally {
-            store = null;
-        }
+			store = null;
+		}
 	}
 
 	public Date getLastCheck() {
@@ -133,12 +133,9 @@ public class BBMailManager {
 		var pairs = new ArrayList<Pair<String, String>>();
 		if (!messages.isEmpty()) {
 			for (var msg : messages) {
-                Address[] from = msg.getFrom();
-                InternetAddress sender = (from == null || from.length == 0) ? null : (InternetAddress) from[0];
-				pairs.add(Pair.of(
-                        sender == null ? null : sender.getPersonal(),
-                        msg.getSubject()
-                        ));
+				Address[] from = msg.getFrom();
+				InternetAddress sender = (from == null || from.length == 0) ? null : (InternetAddress) from[0];
+				pairs.add(Pair.of(sender == null ? null : sender.getPersonal(), msg.getSubject()));
 			}
 		}
 		return pairs;
@@ -146,7 +143,7 @@ public class BBMailManager {
 
 	private @NotNull List<Message> getRecentMessages(Folder emailFolder) throws MessagingException {
 		List<Message> messages = new ArrayList<>();
-        var length = Math.min(emailFolder.getMessageCount(), NEW_MSG_COUNT);
+		var length = Math.min(emailFolder.getMessageCount(), NEW_MSG_COUNT);
 		for (int i = 0; i < length; i++) {
 			var current = emailFolder.getMessage(emailFolder.getMessageCount() - i);
 			if (current.isExpunged() || !current.getReceivedDate().after(this.lastCheck))

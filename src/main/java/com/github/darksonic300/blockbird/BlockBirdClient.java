@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 @Mod(value = BlockBird.MODID, dist = Dist.CLIENT)
 public class BlockBirdClient {
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	private BBMailManager emailManager;
 	private static boolean showScreen = true;
@@ -53,13 +53,13 @@ public class BlockBirdClient {
 		this.emailManager = BBMailManager.getInstance(BBConfig.PROVIDER.get(), BBConfig.EMAIL.get(),
 				BBConfig.PASSWORD.get());
 
-        this.executorService.submit(() -> {
-            this.emailManager.initialize();
-            Component component = this.emailManager.isInitialized() ?
-                    Component.translatable("gui.blockbird.toast.enabled") :
-                    Component.translatable("gui.blockbird.toast.disabled");
-            BBToasts.info(component);
-        });
+		this.executorService.submit(() -> {
+			this.emailManager.initialize();
+			Component component = this.emailManager.isInitialized()
+					? Component.translatable("gui.blockbird.toast.enabled")
+					: Component.translatable("gui.blockbird.toast.disabled");
+			BBToasts.info(component);
+		});
 	}
 
 	public void onWorldUnload(ClientPlayerNetworkEvent.LoggingOut event) {
@@ -74,11 +74,11 @@ public class BlockBirdClient {
 		if (!BBUtils.hasEnoughTimePassed(emailManager))
 			return;
 
-        this.executorService.submit(() -> {
-            var messages = this.emailManager.check();
-            if (messages == null || messages.isEmpty())
-                return;
-            messages.forEach(BBToasts::email);
-        });
+		this.executorService.submit(() -> {
+			var messages = this.emailManager.check();
+			if (messages == null || messages.isEmpty())
+				return;
+			messages.forEach(BBToasts::email);
+		});
 	}
 }

@@ -8,14 +8,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class BBToasts {
 	public static void email(Pair<String, String> msg) {
-        Minecraft.getInstance().execute(() ->
-                Minecraft.getInstance().getToasts().addToast(new BBEmailToast(msg))
-        );
+		Minecraft.getInstance().execute(() -> Minecraft.getInstance().getToasts().addToast(new BBEmailToast(msg)));
 	}
 
 	public static void info(Component cmp) {
-		Minecraft.getInstance().execute(() ->
-                Minecraft.getInstance().getToasts().addToast(new BBBaseToast(cmp))
-        );
+		Minecraft.getInstance().execute(() -> Minecraft.getInstance().getToasts().addToast(new BBBaseToast(cmp)));
 	}
 }
