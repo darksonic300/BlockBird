@@ -3,7 +3,6 @@ package com.github.darksonic300.blockbird.screen;
 import com.github.darksonic300.blockbird.BlockBird;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -13,15 +12,13 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.gui.ModListScreen;
 
-import java.awt.*;
-
 @OnlyIn(Dist.CLIENT)
-public class ConfigReminderScreen extends Screen {
+public class BBConfigReminderScreen extends Screen {
 	private static final ResourceLocation LOGO_LOCATION = ResourceLocation.fromNamespaceAndPath(BlockBird.MODID,
 			"textures/gui/blockbird.png");
 	private final Screen parentScreen;
 
-	public ConfigReminderScreen(Screen parentScreen) {
+	public BBConfigReminderScreen(Screen parentScreen) {
 		super(Component.literal("BlockBird"));
 		this.parentScreen = parentScreen;
 	}

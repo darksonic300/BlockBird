@@ -5,7 +5,7 @@ public enum IMAPSProvider {
 			993);
 
 	/**
-	 * Does not automatically add the "smtp" prefix
+	 * Does not automatically add the "imaps" prefix
 	 */
 	public final String host;
 	/**

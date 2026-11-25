@@ -1,6 +1,6 @@
 package com.github.darksonic300.blockbird;
 
-import com.github.darksonic300.blockbird.screen.ConfigReminderScreen;
+import com.github.darksonic300.blockbird.screen.BBConfigReminderScreen;
 import com.github.darksonic300.blockbird.util.BBToasts;
 import com.github.darksonic300.blockbird.util.BBUtils;
 import net.minecraft.client.gui.screens.Screen;
@@ -45,7 +45,7 @@ public class BlockBirdClient {
 		if (!(screen instanceof TitleScreen title) || !showScreen)
 			return;
 
-		event.setNewScreen(new ConfigReminderScreen(title));
+		event.setNewScreen(new BBConfigReminderScreen(title));
 		showScreen = false;
 	}
 
